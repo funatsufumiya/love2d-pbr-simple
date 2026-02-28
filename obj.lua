@@ -97,14 +97,28 @@ for i = 1, #indices - 2, 1 do
     local i1 = indices[i] + 1
     local i2 = indices[i + 1] + 1
     local i3 = indices[i + 2] + 1
-    if (i3 - 1) % 2 == 0 then
-        table.insert(sphere_verts, vertDatas[i1])
-        table.insert(sphere_verts, vertDatas[i2])
-        table.insert(sphere_verts, vertDatas[i3])
-    else -- opengl中，顶点索引数为奇数是采用[n-1,n-2,n]顺序
-        table.insert(sphere_verts, vertDatas[i2])
-        table.insert(sphere_verts, vertDatas[i1])
-        table.insert(sphere_verts, vertDatas[i3])
+    -- Use face normal orientation to ensure consistent winding (prevent alternating flipped triangles)
+    local v1 = vertDatas[i1]
+    local v2 = vertDatas[i2]
+    local v3 = vertDatas[i3]
+    local x1, y1, z1 = v1[1], v1[2], v1[3]
+    local x2, y2, z2 = v2[1], v2[2], v2[3]
+    local x3, y3, z3 = v3[1], v3[2], v3[3]
+    local ux, uy, uz = x2 - x1, y2 - y1, z2 - z1
+    local vx, vy, vz = x3 - x1, y3 - y1, z3 - z1
+    local nx = uy * vz - uz * vy
+    local ny = uz * vx - ux * vz
+    local nz = ux * vy - uy * vx
+    -- vertex normal stored in components 4-6; use it to decide outward-facing
+    local dot = nx * v1[4] + ny * v1[5] + nz * v1[6]
+    if dot >= 0 then
+        table.insert(sphere_verts, v1)
+        table.insert(sphere_verts, v2)
+        table.insert(sphere_verts, v3)
+    else
+        table.insert(sphere_verts, v2)
+        table.insert(sphere_verts, v1)
+        table.insert(sphere_verts, v3)
     end
 end
 

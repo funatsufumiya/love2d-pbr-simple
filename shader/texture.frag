@@ -76,6 +76,8 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
 {
+    // // Force discard of back-facing fragments to avoid rendering reversed-triangle artifacts
+    // if (!gl_FrontFacing) discard;
     vec3 albedo     = pow(Texel(albedoMap, texture_coords).rgb, vec3(2.2));
     float metallic  = Texel(metallicMap, texture_coords).r;
     float roughness = Texel(roughnessMap, texture_coords).r;

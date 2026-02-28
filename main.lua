@@ -82,6 +82,12 @@ function love.load()
     -- use the project's sphere vertex data for correct topology/normals
         -- enable depth testing to avoid Z-fighting artifacts
         love.graphics.setDepthMode("lequal", true)
+        -- use strict "less" to avoid equal-depth race conditions on some drivers
+        -- love.graphics.setDepthMode("less", true)
+        -- enable back-face culling when available to avoid rendering reversed/duplicate triangles
+        if love.graphics.setMeshCullMode then
+            love.graphics.setMeshCullMode("back")
+        end
 
         -- use the project's sphere vertex data for correct topology/normals
         mesh = love.graphics.newMesh(vertexFormat, obj.sphere, "triangles")
